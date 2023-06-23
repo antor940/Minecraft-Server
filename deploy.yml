@@ -1,0 +1,18 @@
+name: Minecraft Server Continuous Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Start Minecraft Server
+        run: |
+          java -Xmx1024M -Xms1024M -jar <server_file_name>.jar nogui
