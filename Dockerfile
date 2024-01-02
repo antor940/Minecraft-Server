@@ -1,31 +1,15 @@
-# Use the official Ubuntu base image
+# Use a base image that supports systemd, for example, Ubuntu
 FROM ubuntu:22.04
 
-# Set environment variables
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Update package lists and install basic packages
+# Install necessary packages
 RUN apt-get update && \
-    apt-get install -y \
-    sudo \
-    curl \
-    wget \
-    git \
-    vim \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+apt-get install -y shellinabox && \
+apt-get install -y systemd && \
+apt-get clean && \
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN echo 'admin:root' | chpasswd
+# Expose the web-based terminal port
+EXPOSE 4200
 
-# Set a default user (optional)
-RUN useradd -ms /bin/bash myuser
-USER myuser
-
-# Set the working directory
-WORKDIR /home/myuser/app
-
-# Example: Copy files into the container
-COPY . .
-
-# Your additional configurations and commands go here
-
-# Start a command or service
-CMD ["bash"]
+# Start shellinabox
+CMD ["/usr/bin/shellinaboxd", "-t", "-s", "/:LOGIN"]
