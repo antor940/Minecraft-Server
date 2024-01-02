@@ -1,34 +1,31 @@
-# Use an official PHP runtime as a parent image
-FROM php:7.4-apache
+# Use the official Ubuntu base image
+FROM ubuntu:22.04
 
-# Install necessary packages
-RUN apt-get update && apt-get install -y \
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Update package lists and install basic packages
+RUN apt-get update && \
+    apt-get install -y \
+    sudo \
     curl \
+    wget \
     git \
-    zip \
-    unzip \
-    openssl
+    vim \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Enable necessary PHP extensions
-RUN docker-php-ext-install pdo pdo_mysql
+# Set a default user (optional)
+RUN useradd -ms /bin/bash myuser
+USER myuser
 
-# Download and install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Set the working directory
+WORKDIR /home/myuser/app
 
-# Set the working directory in the container to /var/www/html
-WORKDIR /var/www/html
+# Example: Copy files into the container
+COPY . .
 
-# Copy the PufferPanel source code into the container
-RUN git clone https://github.com/PufferPanel/PufferPanel .
+# Your additional configurations and commands go here
 
-# Install PufferPanel dependencies
-RUN composer install
-
-# Copy the PufferPanel configuration file into the container
-COPY pufferpanel.json /var/www/html
-
-# Expose port 80
-EXPOSE 80
-
-# Start Apache
-CMD ["apache2-foreground"]
+# Start a command or service
+CMD ["bash"]
